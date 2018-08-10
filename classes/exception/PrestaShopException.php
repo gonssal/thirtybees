@@ -67,7 +67,8 @@ class PrestaShopExceptionCore extends Exception
     }
 
     /**
-     * This method acts like an error handler, if dev mode is on, display the error else use a better silent way
+     * This method acts like an error handler, if dev mode is on,
+     * display the error else use a better silent way.
      *
      * @since 1.0.0
      * @version 1.0.0 Initial version
@@ -79,36 +80,82 @@ class PrestaShopExceptionCore extends Exception
         if (_PS_MODE_DEV_ || getenv('CI')) {
             // Display error message
             echo '<style>
-				#psException{font-family: Verdana; font-size: 14px}
-				#psException h2{color: #F20000}
-				#psException p{padding-left: 20px}
-				#psException ul li{margin-bottom: 10px}
-				#psException a{font-size: 12px; color: #000000}
-				#psException .psTrace, #psException .psArgs{display: none}
-				#psException pre{border: 1px solid #236B04; background-color: #EAFEE1; padding: 5px; font-family: Courier; width: 99%; overflow-x: auto; margin-bottom: 30px;}
-				#psException .psArgs pre{background-color: #F1FDFE;}
-				#psException pre .selected{color: #F20000; font-weight: bold;}
-			</style>';
+                #psException {
+                    border: 3px solid #1a1a1a;
+                    padding: 15px;
+                    color: #fafafa;
+                    background: #333;
+                }
+                #psException h2 {
+                    margin: 0 0 1em 0;
+                    color: #f6d426;
+                }
+                #psException p {
+                    padding-left: 20px
+                }
+                #psException ul li {
+                    margin-bottom: 10px
+                }
+                #psException a {
+                    cursor: pointer;
+                    font-size: 12px;
+                    color: #f6d426;
+                }
+                #psException a:hover {
+                    color: #fff;
+                }
+                #psException .psTrace, #psException .psArgs {
+                    display: none
+                }
+                #psException pre {
+                    border: 3px solid #1a1a1a;
+                    color: #000;
+                    background-color: #efefef;
+                    padding: 5px;
+                    font-family: monospace, monospace;
+                    overflow-x: auto;
+                    margin: 10px 0 30px 0;
+                }
+                #psException .psArgs pre {
+                    background-color: #fefef5;
+                }
+                #psException pre .selected {
+                    display: block;
+                    color: #f61c1f;
+                    font-weight: bold;
+                    background-color: #dfdfdf;
+                }
+            </style>';
             echo '<div id="psException">';
-            echo '<h2>['.str_replace('PrestaShop', 'ThirtyBees', get_class($this)).']</h2>';
+            echo '<h2>'.str_replace('PrestaShop', 'ThirtyBees', get_class($this)).'</h2>';
             echo $this->getExtendedMessage();
 
             echo $this->displayFileDebug($this->file, $this->line);
 
-            // Display debug backtrace
+            // Display debug backtrace.
             echo '<ul>';
             foreach ($this->trace as $id => $trace) {
-                $relativeFile = (isset($trace['file'])) ? ltrim(str_replace([_PS_ROOT_DIR_, '\\'], ['', '/'], $trace['file']), '/') : '';
+                $relativeFile =
+                    (isset($trace['file']))
+                    ? ltrim(str_replace([_PS_ROOT_DIR_, '\\'], ['', '/'], $trace['file']), '/')
+                    : '';
                 $currentLine = (isset($trace['line'])) ? $trace['line'] : '';
                 if (defined('_PS_ADMIN_DIR_')) {
-                    $relativeFile = str_replace(basename(_PS_ADMIN_DIR_).DIRECTORY_SEPARATOR, 'admin'.DIRECTORY_SEPARATOR, $relativeFile);
+                    $relativeFile = str_replace(
+                        basename(_PS_ADMIN_DIR_).DIRECTORY_SEPARATOR,
+                        'admin'.DIRECTORY_SEPARATOR,
+                        $relativeFile
+                    );
                 }
                 echo '<li>';
-                echo '<b>'.((isset($trace['class'])) ? $trace['class'] : '').((isset($trace['type'])) ? $trace['type'] : '').$trace['function'].'</b>';
-                echo ' - <a style="font-size: 12px; color: #000000; cursor:pointer; color: blue;" onclick="document.getElementById(\'psTrace_'.$id.'\').style.display = (document.getElementById(\'psTrace_'.$id.'\').style.display != \'block\') ? \'block\' : \'none\'; return false">[line '.$currentLine.' - '.$relativeFile.']</a>';
+                echo '<strong>'
+                    .((isset($trace['class'])) ? $trace['class'] : '').((isset($trace['type']))
+                    ? $trace['type']
+                    : '').$trace['function'].'</strong>';
+                echo ' - <a onclick="document.getElementById(\'psTrace_'.$id.'\').style.display = (document.getElementById(\'psTrace_'.$id.'\').style.display != \'block\') ? \'block\' : \'none\'; return false">[line '.$currentLine.' - '.$relativeFile.']</a>';
 
                 if (isset($trace['args']) && count($trace['args'])) {
-                    echo ' - <a style="font-size: 12px; color: #000000; cursor:pointer; color: blue;" onclick="document.getElementById(\'psArgs_'.$id.'\').style.display = (document.getElementById(\'psArgs_'.$id.'\').style.display != \'block\') ? \'block\' : \'none\'; return false">['.count($trace['args']).' Arguments]</a>';
+                    echo ' - <a onclick="document.getElementById(\'psArgs_'.$id.'\').style.display = (document.getElementById(\'psArgs_'.$id.'\').style.display != \'block\') ? \'block\' : \'none\'; return false">['.count($trace['args']).' Arguments]</a>';
                 }
 
                 if ($relativeFile) {
@@ -123,14 +170,14 @@ class PrestaShopExceptionCore extends Exception
             echo '</div>';
         } else {
             header('Content-Type: text/plain; charset=UTF-8');
-            // Display error message
+            // Display error message.
             $markdown = '';
             $markdown .= '## '.str_replace('PrestaShop', 'ThirtyBees', get_class($this)).'  ';
             $markdown .= $this->getExtendedMessageMarkdown();
 
             $markdown .= $this->displayFileDebug($this->file, $this->line, null, true);
 
-            // Display debug backtrace
+            // Display debug backtrace.
             foreach ($this->trace as $id => $trace) {
                 $relativeFile = (isset($trace['file'])) ? ltrim(str_replace([_PS_ROOT_DIR_, '\\'], ['', '/'], $trace['file']), '/') : '';
                 $currentLine = (isset($trace['line'])) ? $trace['line'] : '';
@@ -157,15 +204,15 @@ class PrestaShopExceptionCore extends Exception
 
             echo $this->displayErrorTemplate(_PS_ROOT_DIR_.'/error500.phtml', ['markdown' => $markdown]);
         }
-        // Log the error to the disk
+        // Log the error to the disk.
         $this->logError();
-        exit;
+        // exit;
     }
 
     /**
-     * Display lines around current line
+     * Display lines around current line.
      *
-     * Markdown is returned instead of being printed
+     * Markdown is returned instead of being printed.
      * (HTML is printed because old backwards stuff blabla)
      *
      * @param string $file
@@ -244,7 +291,7 @@ class PrestaShopExceptionCore extends Exception
         } else {
             echo '<div class="psArgs" id="psArgs_'.$id.'"><pre>';
             foreach ($args as $arg => $value) {
-                echo '<b>Argument ['.Tools::safeOutput($arg)."]</b>\n";
+                echo '<strong>Argument ['.Tools::safeOutput($arg)."]</strong>\n";
                 echo Tools::safeOutput(print_r($value, true));
                 echo "\n";
             }
@@ -286,7 +333,7 @@ class PrestaShopExceptionCore extends Exception
      */
     protected function getExtendedMessage($html = true)
     {
-        $format = '<p><b>%s</b><br /><i>at line </i><b>%d</b><i> in file </i><b>%s</b></p>';
+        $format = '<p><strong>%s</strong><br /><em>at line </em><strong>%d</strong><em> in file </em><strong>%s</strong></p>';
         if (!$html) {
             $format = strip_tags(str_replace('<br />', ' ', $format));
         }
