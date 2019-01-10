@@ -334,7 +334,6 @@ abstract class Controller extends ControllerCore
         uasort($this->hooks_perfs, 'prestashop_querytime_sort');
 
         $queries = Db::getInstance()->queries;
-        // var_dump(Db::getInstance()->tables);
         uasort($queries, 'prestashop_querytime_sort');
         foreach ($queries as $data) {
             $query_row = array(
@@ -852,7 +851,7 @@ abstract class Controller extends ControllerCore
                 }
             }
         </style>
-        <script src="https://cdn.rawgit.com/drvic10k/bootstrap-sortable/1.11.2/Scripts/bootstrap-sortable.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/gh/drvic10k/bootstrap-sortable@2.1.0/Scripts/bootstrap-sortable.js"></script> -->
 <?php
     }
 
@@ -1184,21 +1183,22 @@ abstract class Controller extends ControllerCore
             <div class="sf-toolbar-info"><div class="sf-toolbar-info-group">
                 <div class="search">
                     <input
-                        type="text"
+                        type="search"
                         name="database-queries-search"
                         id="database-queries-search"
                         placeholder="Search queries"
+                        aria-label="Search queries"
                         />
                 </div>
                 <table class="profiling-table sortable">
                     <thead>
                         <tr>
                             <th>Query</th>
+                            <th data-defaultsort="disabled" class="center">Details</th>
                             <th data-defaultsort="desc">Time (ms)</th>
                             <th>Rows</th>
                             <th>Filesort</th>
                             <th>Group By</th>
-                            <th data-defaultsort="disabled" class="center">Details</th>
                             <th>Location</th>
                         </tr>
                     </thead>
@@ -1212,22 +1212,6 @@ abstract class Controller extends ControllerCore
             echo '
                         <tr>
                             <td>'.strtok($data['query'], ' ').'</td>
-                            <td data-value="'.($sane_time).'" class="center">
-                                <span '.$this->getTimeColor($sane_time).'>'.
-                                    ($rounded_sane_time < 0.1 ? '< 1' : $rounded_sane_time)
-                                .'</span>
-                            </td>
-                            <td class="center">'.(int)$data['rows'].'</td>
-                            <td data-value="'.$data['filesort'].'" class="center">'.(
-                                $data['filesort']
-                                ? ('<span style="color:'.$this->color_red.'">Yes</span>')
-                                : ('<span style="color:'.$this->color_green.'">No</span>')
-                            ).'</td>
-                            <td data-value="'.$data['group_by'].'" class="center">'.(
-                                $data['group_by']
-                                ? ('<span style="color:'.$this->color_red.'">Yes</span>')
-                                : ('<span style="color:'.$this->color_green.'">No</span>')
-                            ).'</td>
                             <td class="center details nowrap" data-value="">
                                 <a
                                     href="#query'.$i.'"
@@ -1286,6 +1270,22 @@ abstract class Controller extends ControllerCore
             }
             echo '
                             </td>
+                            <td data-value="'.($sane_time).'" class="center">
+                                <span '.$this->getTimeColor($sane_time).'>'.
+                                    ($rounded_sane_time < 0.1 ? '< 1' : $rounded_sane_time)
+                                .'</span>
+                            </td>
+                            <td class="center">'.(int)$data['rows'].'</td>
+                            <td class="center">'.(
+                                $data['filesort']
+                                ? ('<span style="color:'.$this->color_red.'">Yes</span>')
+                                : ('<span style="color:'.$this->color_green.'">No</span>')
+                            ).'</td>
+                            <td class="center">'.(
+                                $data['group_by']
+                                ? ('<span style="color:'.$this->color_red.'">Yes</span>')
+                                : ('<span style="color:'.$this->color_green.'">No</span>')
+                            ).'</td>
                             <td data-value="'.$data['location'].'">
                                 <a href="javascript:void(0);" onclick="$(\'#callstack_'.$callstack_md5.'\').toggle();">'.$data['location'].'</a>
                                 <div id="callstack_'.$callstack_md5.'" style="display:none">'.implode('<br />', $data['stack']).'</div>
